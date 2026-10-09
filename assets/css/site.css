@@ -1,0 +1,4 @@
+/* Estados iniciais controlados pelo main.js (equivalentes aos embeds originais) */
+[data-split] { visibility: hidden; }
+.about-headline-d [data-about-move],
+.about-headline-d [data-about-top] { display: inline-block; will-change: transform, opacity, filter; }

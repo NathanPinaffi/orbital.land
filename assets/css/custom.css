@@ -1,0 +1,35 @@
+/* Estilos globais (w-embed) capturados do site original */
+.wf-force-outline-none[tabindex="-1"]:focus { outline: none; }
+::-webkit-scrollbar { width: 4px; }
+::-webkit-scrollbar-track { background: #050505; border-radius: 10px; }
+::-webkit-scrollbar-thumb { background: rgba(249, 115, 22, 0.6); border-radius: 10px; }
+::-webkit-scrollbar-thumb:hover { background: rgba(249, 115, 22, 0.6); }
+::selection { background-color: rgba(249, 115, 22, 0.6); color: white; }
+.w-webflow-badge { display: none !important; }
+[view-item="from-center"] { transform: scale(0.6); opacity: 0; transition: transform 2s cubic-bezier(0.19, 1, 0.22, 1), opacity 0.2s; }
+[view-item="from-center"].view { transform: scale(1); opacity: 1; }
+[view-item="from-down"] { transform: scale(0.6) translateY(50%); opacity: 0; transition: transform 2s cubic-bezier(0.19, 1, 0.22, 1), opacity 0.2s; }
+[view-item="from-down"].view { transform: scale(1) translateY(0%); opacity: 1; }
+[view-item="about-tag"] { margin-left: 0.5rem; margin-right: 0.5rem; width: 0rem; height: 0rem; opacity: 0; }
+[view-item="about-tag"].view { margin-left: 2rem; margin-right: 2rem; width: 11.5rem; height: 8rem; opacity: 1; }
+.about-pg-word { display: inline-block; transform: translateX(20rem); opacity: 0; filter: blur(0.6rem); }
+.lenis.lenis-smooth { scroll-behavior: auto; }
+html.lenis { height: auto; }
+html { font-size: 1rem; }
+.card-gradient-point { animation: 12s linear 0s infinite normal none running rotate360; }
+.form-blur-ellipse { filter: blur(10rem); }
+.form-blur-ellipse { background: radial-gradient(123.76% 123.76% at 50% -2.9%, rgb(18, 8, 5) 44.1%, rgb(93, 34, 90) 61.39%, rgb(234, 120, 39) 77%, rgb(251, 180, 38) 87%, rgba(0, 0, 0, 0) 100%); }
+@media screen and (min-width: 240px) {
+  html { font-size: 1vw; }
+}
+@media screen and (min-width: 1920px) {
+  html { font-size: 0.8vw; }
+  .container { width: 100rem; }
+}
+@media screen and (min-width: 1920px) and (min-aspect-ratio: 21 / 9) {
+  html { font-size: calc(19.2px); }
+}
+@media (max-width: 479px) {
+  .form-blur-ellipse { filter: blur(30rem); }
+}
+@keyframes rotate360 { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
