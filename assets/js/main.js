@@ -345,13 +345,13 @@
   // celular em perspectiva 3D, balançando devagar
   const phone3d = document.querySelector(".orb-phone3d");
   if (phone3d) {
-    gsap.set(phone3d, { transformPerspective: 1600, rotationY: -24, rotationX: 12, rotationZ: -2 });
+    gsap.set(phone3d, { transformPerspective: 900, rotationY: -28, rotationX: 12, rotationZ: -2 });
     if (!reduce) {
       gsap.timeline({ repeat: -1, yoyo: true, defaults: { ease: "sine.inOut" } })
         .to(phone3d, { rotationY: -8, rotationX: 5, rotationZ: 2, y: "-1.2rem", duration: 3.6 });
     }
   }
-  const heroPhone = document.querySelector(".orb-phone3d > svg");
+  const heroPhone = document.querySelector(".orb-phone-body");
   if (heroPhone && matchMedia("(hover: hover)").matches && !reduce) {
     const rx = gsap.quickTo(heroPhone, "rotationY", { duration: 1.2, ease: "power3.out" });
     const ry = gsap.quickTo(heroPhone, "rotationX", { duration: 1.2, ease: "power3.out" });
@@ -540,8 +540,68 @@
   // sublinhado roxo em "um dos melhores do mundo!", uma linha depois da outra
   const underline = gsap.utils.toArray(".orb-exams .orb-underline");
   if (underline.length) {
-    gsap.to(underline, { backgroundSize: "100% .07em", duration: 0.9, stagger: 0.55, ease: "power2.inOut", delay: 0.9,
-      scrollTrigger: { trigger: ".orb-exams .orb-sec-title", start: "top 80%" } });
+    // traço à mão (levemente ondulado) desenhado como caneta, uma linha depois da outra
+    const strokes = underline.map((el, i) => {
+      // desenhado em pixels reais, para o traço ter a mesma espessura em qualquer largura de linha
+      const fs = parseFloat(getComputedStyle(el).fontSize);
+      const W = Math.max(20, el.getBoundingClientRect().width - (/\s$/.test(el.textContent) ? fs * 0.26 : 0)), H = parseFloat(getComputedStyle(el).fontSize) * 0.3;
+      const w = (a) => Math.sin(i * 3.1 + a) * H * 0.12;
+      const P = (x, y) => `${(x * W).toFixed(1)} ${(y * H + w(x * 7)).toFixed(1)}`;
+      el.insertAdjacentHTML("beforeend",
+        `<svg class="orb-pen-line" viewBox="0 0 ${W.toFixed(1)} ${H.toFixed(1)}" aria-hidden="true">` +
+        `<path pathLength="1" d="M ${P(0.01, 0.6)} C ${P(0.2, 0.4)}, ${P(0.45, 0.75)}, ${P(0.65, 0.5)} S ${P(0.92, 0.45)}, ${P(0.99, 0.55)}"/>` +
+        `<path pathLength="1" d="M ${P(0.04, 0.78)} C ${P(0.3, 0.62)}, ${P(0.6, 0.86)}, ${P(0.97, 0.66)}"/></svg>`);
+      return el.querySelectorAll(".orb-pen-line path");
+    });
+    const pen = gsap.timeline({ delay: 0.9, scrollTrigger: { trigger: ".orb-exams .orb-sec-title", start: "top 80%" } });
+    strokes.forEach(([main, thin]) => {
+      pen.to(main, { strokeDashoffset: 0, duration: 0.85, ease: "power1.inOut" })
+        .to(thin, { strokeDashoffset: 0, duration: 0.5, ease: "power2.out" }, "-=0.25");
+    });
+  }
+
+  // ---------------------------------------------------------------- CTA: "Entre em órbita conosco" à caneta
+  const note = document.querySelector(".orb-pen-note");
+  if (note) {
+    const wipe = note.querySelector(".pn-wipe"), nib = note.querySelector(".pn-nib");
+    const swoosh = note.querySelector(".pn-swoosh"), text = note.querySelector(".pn-text");
+    const card = document.querySelector(".cta-card-wrapper");
+    // ancora o recado no canto superior esquerdo do card (o wrapper corta overflow, então o recado mora fora dele)
+    const place = () => {
+      const rem = parseFloat(getComputedStyle(document.documentElement).fontSize);
+      note.style.left = card.offsetLeft - rem * (innerWidth < 480 ? 1 : 3.5) + "px";
+      note.style.top = card.offsetTop - note.offsetHeight * 0.32 + "px";
+    };
+    place();
+    addEventListener("resize", place);
+    if (document.fonts) document.fonts.ready.then(place);
+    if (reduce) {
+      gsap.set(wipe, { attr: { width: 720 } }); gsap.set(swoosh, { strokeDashoffset: 0 });
+    } else {
+      const end = 14 + text.getComputedTextLength() + 8;
+      const write = { x: 0 };
+      const writeTl = gsap.timeline({ paused: true })
+        .set(nib, { opacity: 1 })
+        .to(write, {
+          x: end, duration: 2.4, ease: "power1.inOut",
+          onUpdate: () => {
+            wipe.setAttribute("width", write.x);
+            // a ponta da caneta sobe e desce um pouco enquanto escreve
+            nib.setAttribute("cx", Math.max(14, write.x));
+            nib.setAttribute("cy", 72 + Math.sin(write.x / 9) * 14);
+          },
+        })
+        .to(nib, { attr: { cx: 30, cy: 132 }, duration: 0.25, ease: "power2.inOut" })
+        .to(swoosh, { strokeDashoffset: 0, duration: 0.7, ease: "power2.inOut" }, "<0.1")
+        .to(nib, { attr: { cx: 700, cy: 118 }, duration: 0.7, ease: "power2.inOut" }, "<")
+        .to(nib, { opacity: 0, duration: 0.3 });
+      // o card fica num bloco sticky controlado pelo Webflow; IntersectionObserver é mais confiável que o ScrollTrigger aqui
+      const io = new IntersectionObserver((es) => {
+        if (es.some((e) => e.isIntersecting)) { writeTl.play(); io.disconnect(); }
+      }, { threshold: 0.45 });
+      io.observe(card);
+      gsap.to(note, { y: "-0.6rem", rotation: -8, duration: 3.2, ease: "sine.inOut", repeat: -1, yoyo: true });
+    }
   }
 
   // ---------------------------------------------------------------- Para professores: blur ao subir
